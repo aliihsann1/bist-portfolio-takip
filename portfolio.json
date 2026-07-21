@@ -1,7 +1,77 @@
 {
-  "generated_at": null,
-  "holdings": [],
-  "totals": { "value": 0, "cost": 0, "pnl_tl": 0, "pnl_pct": 0 },
-  "history": [],
-  "transactions": []
+  "generated_at": "2026-07-21T09:06:44.782900+00:00",
+  "holdings": [
+    {
+      "symbol": "gram-altin",
+      "asset_type": "fx",
+      "shares": 10.0,
+      "avg_cost": 5450.0,
+      "current_price": 5450.0,
+      "value": 54500.0,
+      "cost_basis": 54500.0,
+      "pnl_tl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "symbol": "GARAN",
+      "asset_type": "stock",
+      "shares": 100.0,
+      "avg_cost": 118.5,
+      "current_price": 125.2,
+      "value": 12520.0,
+      "cost_basis": 11850.0,
+      "pnl_tl": 670.0,
+      "pnl_pct": 5.654008438818566
+    },
+    {
+      "symbol": "YAY",
+      "asset_type": "fund",
+      "shares": 500.0,
+      "avg_cost": 1.65,
+      "current_price": 1.65,
+      "value": 825.0,
+      "cost_basis": 825.0,
+      "pnl_tl": 0.0,
+      "pnl_pct": 0.0
+    }
+  ],
+  "totals": {
+    "value": 67845.0,
+    "cost": 67175.0,
+    "pnl_tl": 670.0,
+    "pnl_pct": 0.997394864160774
+  },
+  "history": [
+    {
+      "t": "2026-07-21T09:06:44.782900+00:00",
+      "v": 67845.0,
+      "pnl_pct": 0.997394864160774
+    }
+  ],
+  "transactions": [
+    {
+      "date": "2026-07-01",
+      "symbol": "gram-altin",
+      "asset_type": "fx",
+      "action": "Alış",
+      "shares": 10,
+      "price": 5450.0
+    },
+    {
+      "date": "2026-06-15",
+      "symbol": "YAY",
+      "asset_type": "fund",
+      "action": "Alış",
+      "shares": 500,
+      "price": 1.65
+    },
+    {
+      "date": "2026-06-01",
+      "symbol": "GARAN",
+      "asset_type": "stock",
+      "action": "Alış",
+      "shares": 100,
+      "price": 118.5
+    }
+  ]
 }
