@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canlı Portföy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0F14;
+    --panel: #121822;
+    --panel-2: #0F1520;
+    --border: #212B38;
+    --ink: #E8ECF1;
+    --muted: #7C8798;
+    --gold: #C9A24B;
+    --green: #3FBF7F;
+    --red: #E2574C;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+
+  .header {
+    padding: 22px 24px 0 24px;
+    display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .title { font-size: 15px; letter-spacing: 3px; font-weight: 600; color: var(--gold); text-transform: uppercase; }
+  .sub { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .ticker-wrap {
+    margin-top: 16px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: var(--panel-2); overflow: hidden; position: relative; height: 34px;
+  }
+  .ticker-track {
+    display: flex; align-items: center; white-space: nowrap; position: absolute;
+    animation: scroll 40s linear infinite; font-family: var(--mono); font-size: 12.5px;
+  }
+  @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .ticker-item { padding: 0 22px; display: flex; align-items: center; gap: 8px; height: 34px; border-right: 1px solid var(--border); }
+  .ticker-item .sym { color: var(--muted); }
+
+  .main { padding: 28px 24px 60px 24px; max-width: 980px; margin: 0 auto; }
+
+  .hero { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  .hero-value { font-family: var(--mono); font-size: 42px; font-weight: 500; letter-spacing: -1px; }
+  .hero-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+  .hero-pnl { font-family: var(--mono); font-size: 22px; font-weight: 500; }
+
+  .section { margin-top: 32px; }
+  .section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+
+  .chart-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+
+  .alloc-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; }
+  .alloc-name { width: 130px; color: var(--muted); flex-shrink: 0; }
+  .alloc-bar-wrap { flex: 1; height: 8px; background: var(--panel-2); border-radius: 2px; overflow: hidden; }
+  .alloc-bar { height: 100%; background: var(--gold); }
+  .alloc-pct { width: 48px; text-align: right; font-family: var(--mono); flex-shrink: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px; border-bottom: 1px solid var(--border); font-family: var(--mono); }
+  td.name { font-family: var(--sans); }
+  .tag { font-family: var(--sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
+
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">Canlı Portföy</div>
+  <div class="sub" id="clock"></div>
+</div>
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
+
+<div class="main">
+  <div class="hero">
+    <div>
+      <div class="hero-label">Toplam Değer</div>
+      <div class="hero-value" id="totalValue">—</div>
+    </div>
+    <div>
+      <div class="hero-label">Toplam Kâr / Zarar</div>
+      <div class="hero-pnl" id="totalPnl">—</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Performans</div>
+    <div class="chart-wrap"><svg id="chart" viewBox="0 0 900 260" style="width:100%; height:auto; display:block;"></svg></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Varlık Dağılımı</div>
+    <div id="allocation"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Pozisyonlar</div>
+    <div id="holdingsTable"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">İşlem Geçmişi</div>
+    <div id="txTable"></div>
+  </div>
+
+  <div class="footer" id="updatedAt"></div>
+</div>
+
+<script>
+function fmtTL(n) {
+  return Number(n).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+}
+function fmtPct(n) {
+  const v = Number(n);
+  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+}
+function pnlClass(n) { return Number(n) >= 0 ? 'up' : 'down'; }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('tr-TR');
+}
+
+function drawChart(history) {
+  const svg = document.getElementById('chart');
+  if (!history || history.length < 2) {
+    svg.innerHTML = '<text x="450" y="130" fill="#7C8798" font-size="13" text-anchor="middle" font-family="IBM Plex Mono, monospace">Henüz yeterli geçmiş veri yok</text>';
+    return;
+  }
+  const w = 900, h = 260, pad = 30;
+  const values = history.map(p => p.v);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max - min) || 1;
+
+  const points = history.map((p, i) => {
+    const x = pad + (i / (history.length - 1)) * (w - pad * 2);
+    const y = h - pad - ((p.v - min) / range) * (h - pad * 2);
+    return [x, y];
+  });
+
+  const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const areaPath = linePath + ` L${points[points.length-1][0].toFixed(1)},${h-pad} L${points[0][0].toFixed(1)},${h-pad} Z`;
+
+  const up = history[history.length-1].v >= history[0].v;
+  const color = up ? '#3FBF7F' : '#E2574C';
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaPath}" fill="url(#areaGrad)" stroke="none"/>
+    <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2"/>
+  `;
+}
+
+function render(data) {
+  const holdings = data.holdings || [];
+  const totals = data.totals || { value: 0, cost: 0, pnl_tl: 0, pnl_pct: 0 };
+
+  document.getElementById('totalValue').textContent = fmtTL(totals.value);
+  const pnlEl = document.getElementById('totalPnl');
+  pnlEl.textContent = `${fmtTL(totals.pnl_tl)} (${fmtPct(totals.pnl_pct)})`;
+  pnlEl.className = 'hero-pnl ' + pnlClass(totals.pnl_tl);
+
+  // ticker
+  const track = document.getElementById('tickerTrack');
+  const items = holdings.length
+    ? holdings.map(h => `<div class="ticker-item"><span class="sym">${escapeHtml(h.symbol)}</span><span>${fmtTL(h.current_price)}</span><span class="${pnlClass(h.pnl_pct)}">${fmtPct(h.pnl_pct)}</span></div>`).join('')
+    : `<div class="ticker-item"><span class="sym">henüz pozisyon yok</span></div>`;
+  track.innerHTML = items + items;
+
+  drawChart(data.history);
+
+  // allocation by asset_type
+  const byType = {};
+  holdings.forEach(h => { byType[h.asset_type] = (byType[h.asset_type] || 0) + h.value; });
+  const allocEl = document.getElementById('allocation');
+  const typeLabels = { stock: 'BIST', fund: 'TEFAS', fx: 'Döviz/Altın', crypto: 'Kripto' };
+  if (Object.keys(byType).length) {
+    allocEl.innerHTML = Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([type, val]) => {
+      const pct = totals.value > 0 ? (val / totals.value) * 100 : 0;
+      return `<div class="alloc-row">
+        <div class="alloc-name">${escapeHtml(typeLabels[type] || type)}</div>
+        <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="alloc-pct">${pct.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+  } else {
+    allocEl.innerHTML = `<div class="empty">Henüz veri yok.</div>`;
+  }
+
+  // holdings table
+  const holdingsEl = document.getElementById('holdingsTable');
+  holdingsEl.innerHTML = holdings.length ? `
+    <table>
+      <thead><tr><th>Varlık</th><th>Tip</th><th>Adet</th><th>Ort. Maliyet</th><th>Güncel Fiyat</th><th>Değer</th><th>K/Z %</th></tr></thead>
+      <tbody>
+        ${holdings.map(h => `
+          <tr>
+            <td class="name">${escapeHtml(h.symbol)}</td>
+            <td><span class="tag">${escapeHtml(typeLabels[h.asset_type] || h.asset_type)}</span></td>
+            <td>${h.shares}</td>
+            <td>${fmtTL(h.avg_cost)}</td>
+            <td>${fmtTL(h.current_price)}</td>
+            <td>${fmtTL(h.value)}</td>
+            <td class="${pnlClass(h.pnl_pct)}">${fmtPct(h.pnl_pct)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>` : `<div class="empty">Henüz işlem girilmedi.</div>`;
+
+  // transaction history
+  const txEl = document.getElementById('txTable');
+  const txs = data.transactions || [];
+  txEl.innerHTML = txs.length ? `
+    <table>
+      <thead><tr><th>Tarih</th><th>Varlık</th><th>İşlem</th><th>Adet</th><th>Fiyat</th></tr></thead>
+      <tbody>
+        ${txs.map(t => `
+          <tr>
+            <td>${escapeHtml(t.date)}</td>
+            <td class="name">${escapeHtml(t.symbol)}</td>
+            <td class="${t.action === 'Alış' ? 'up' : 'down'}">${escapeHtml(t.action)}</td>
+            <td>${t.shares}</td>
+            <td>${fmtTL(t.price)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>` : `<div class="empty">Henüz işlem yok.</div>`;
+
+  document.getElementById('updatedAt').textContent = data.generated_at
+    ? 'son güncelleme: ' + new Date(data.generated_at).toLocaleString('tr-TR')
+    : 'henüz güncellenmedi';
+}
+
+async function load() {
+  try {
+    const res = await fetch('./portfolio.json?_=' + Date.now());
+    const data = await res.json();
+    render(data);
+  } catch (e) {
+    console.error('portfolio.json okunamadı', e);
+  }
+}
+
+load();
+setInterval(updateClock, 1000);
+setInterval(load, 60000); // her 1 dakikada bir sayfa kendini tazeler
+updateClock();
+</script>
+</body>
+</html>

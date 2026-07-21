@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-06-01",
+    "symbol": "GARAN",
+    "asset_type": "stock",
+    "action": "Alış",
+    "shares": 100,
+    "price": 118.50
+  },
+  {
+    "date": "2026-06-15",
+    "symbol": "YAY",
+    "asset_type": "fund",
+    "action": "Alış",
+    "shares": 500,
+    "price": 1.65
+  },
+  {
+    "date": "2026-07-01",
+    "symbol": "gram-altin",
+    "asset_type": "fx",
+    "action": "Alış",
+    "shares": 10,
+    "price": 5450.0
+  }
+]
