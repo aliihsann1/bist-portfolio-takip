@@ -1,0 +1,36 @@
+name: Portföyü Güncelle
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # her 15 dakikada bir (GitHub'ın pratik minimumu ~5dk, gecikme olabilir)
+  workflow_dispatch:          # Actions sekmesinden elle de tetiklenebilir
+  push:
+    paths:
+      - "transactions.json"   # yeni işlem eklenince hemen çalışsın
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bağımlılıkları kur
+        run: pip install borsapy pandas
+
+      - name: Portföyü hesapla
+        run: python scripts/build_portfolio.py
+
+      - name: Değişikliği commit'le
+        run: |
+          git config user.name "portfoy-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add portfolio.json
+          git diff --staged --quiet || git commit -m "Portföy güncellendi $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
